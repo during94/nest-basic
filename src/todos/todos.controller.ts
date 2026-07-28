@@ -29,7 +29,7 @@ export class TodosController {
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string): Todo | undefined {
+  findOne(@Param('id') id: string): Todo {
     return this.todosService.findOne(id);
   }
 
@@ -39,10 +39,7 @@ export class TodosController {
   }
 
   @Patch(':id')
-  update(
-    @Param('id') id: string,
-    @Body() updateTodoDto: UpdateTodoDto,
-  ): Todo | undefined {
+  update(@Param('id') id: string, @Body() updateTodoDto: UpdateTodoDto): Todo {
     return this.todosService.update(id, updateTodoDto);
   }
 

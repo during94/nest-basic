@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateTodoDto } from './dto/create-todo.dto';
 import type { Todo } from './todo.interface';
 import { UpdateTodoDto } from './dto/update-todo.dto';
@@ -16,8 +16,14 @@ export class TodosService {
     return this.todos.filter((todo) => todo.completed);
   }
 
-  findOne(id: string): Todo | undefined {
-    return this.todos.find((todo) => todo.id === id);
+  findOne(id: string): Todo {
+    const todo = this.todos.find((todo) => todo.id === id);
+
+    if (!todo) {
+      throw new NotFoundException(`${id}번 Todo를 찾을 수 없습니다.`);
+    }
+
+    return todo;
   }
 
   create(createTodoDto: CreateTodoDto): Todo {
@@ -32,27 +38,21 @@ export class TodosService {
     return todo;
   }
 
-  update(id: string, updateTodoDto: UpdateTodoDto): Todo | undefined {
+  update(id: string, updateTodoDto: UpdateTodoDto): Todo {
     const todo = this.findOne(id);
-
-    if (!todo) {
-      return undefined;
-    }
 
     Object.assign(todo, updateTodoDto);
 
     return todo;
   }
 
-  remove(id: string): boolean {
+  remove(id: string): void {
     const index = this.todos.findIndex((todo) => todo.id === id);
 
     if (index === -1) {
-      return false;
+      throw new NotFoundException(`${id}번 Todo를 찾을 수 없습니다.`);
     }
 
     this.todos.splice(index, 1);
-
-    return true;
   }
 }
