@@ -10,47 +10,45 @@ import {
   Post,
 } from '@nestjs/common';
 import { CreateTodoDto } from './dto/create-todo.dto';
+import { TodosService } from './todos.service';
+import type { Todo } from './todo.interface';
+import { UpdateTodoDto } from './dto/update-todo.dto';
 
 @Controller('todos')
 export class TodosController {
+  constructor(private readonly todosService: TodosService) {}
+
   @Get()
-  findAll(): string {
-    return 'Todo 목록';
+  findAll(): Todo[] {
+    return this.todosService.findAll();
   }
 
   @Get('completed')
-  findCompleted(): string {
-    return '완료 Todo 목록';
+  findCompleted(): Todo[] {
+    return this.todosService.findCompleted();
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string): string {
-    return `${id}번 Todo`;
+  findOne(@Param('id') id: string): Todo | undefined {
+    return this.todosService.findOne(id);
   }
 
   @Post()
-  create(@Body() body: CreateTodoDto) {
-    return {
-      id: 1,
-      title: body.title,
-      completed: false,
-    };
+  create(@Body() createTodoDto: CreateTodoDto): Todo {
+    return this.todosService.create(createTodoDto);
   }
 
   @Patch(':id')
   update(
     @Param('id') id: string,
-    @Body() body: { title?: string; completed?: boolean },
-  ) {
-    return {
-      id,
-      ...body,
-    };
+    @Body() updateTodoDto: UpdateTodoDto,
+  ): Todo | undefined {
+    return this.todosService.update(id, updateTodoDto);
   }
 
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
   remove(@Param('id') id: string): void {
-    console.log(`${id}번 todo 삭제`);
+    this.todosService.remove(id);
   }
 }
